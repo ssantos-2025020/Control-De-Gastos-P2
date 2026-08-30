@@ -1,0 +1,29 @@
+<router-outlet></router-outlet>
+
+<!-- Aviso de cierre inminente con opción de extender la sesión -->
+@if (authService.avisoExpiracion(); as aviso) {
+  <div class="session-warning" role="alertdialog" aria-live="assertive">
+    <div class="session-warning-icon">⏳</div>
+    <div class="session-warning-body">
+      <strong>¿Quieres extender tu sesión?</strong>
+      <p>Se cerrará en <b>{{ aviso.segundos }}</b> segundos si no respondes.</p>
+    </div>
+    <div class="session-warning-actions">
+      <button
+        type="button"
+        class="session-warning-btn session-warning-btn-primary"
+        (click)="extender()"
+        [disabled]="extendiendo()"
+      >
+        @if (extendiendo()) {
+          <span class="spinner-sm"></span>
+        } @else {
+          Sí, extender
+        }
+      </button>
+      <button type="button" class="session-warning-btn" (click)="noExtender()">
+        No
+      </button>
+    </div>
+  </div>
+}

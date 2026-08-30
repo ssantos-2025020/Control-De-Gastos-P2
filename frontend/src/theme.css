@@ -1,0 +1,162 @@
+/* ===================================================================
+   LEGATUS — Design Tokens (CSS Custom Properties)
+   Paleta centralizada para todo el proyecto Control de Gastos
+   Tema premium: navy profundo + acentos eléctricos
+   =================================================================== */
+
+:root {
+  /* ─── Backgrounds (navy: #0A0E1A → #0D1224) ─── */
+  --bg-primary: #0a0e1a;
+  --bg-sidebar: #0d1224;
+  --bg-card: rgba(13, 18, 36, 0.88);
+  --bg-glass: rgba(15, 22, 40, 0.72);
+  --bg-login: #0a0e1a;
+  --bg-dropdown: #0f1630;
+  --bg-modal-backdrop: rgba(2, 4, 12, 0.8);
+  --bg-topbar: rgba(10, 14, 26, 0.86);
+
+  /* ─── Brand ─── */
+  --blue-primary: #1268ff;
+  --blue-solid: #1268ff;
+  --teal-primary: #00b9e8;
+  --cyan-solid: #00b9e8;
+  --blue-light: #6ea8ff;
+  --teal-light: #35e0ff;
+  --teal-lighter: #7cf0ff;
+  --blue-soft: #3d8bff;
+
+  /* ─── Semantic: Income / Positive ─── */
+  --green: #00e7a8;
+
+  /* ─── Semantic: Expense / Negative ─── */
+  --red: #ff4259;
+  --red-solid: #ff4259;
+  --red-dark: #e1324a;
+  --red-light: #ff8a9a;
+
+  /* ─── Semantic: Orange ─── */
+  --orange: #ffa500;
+
+  /* ─── Semantic: Teal stat ─── */
+  --cyan: #00b9e8;
+
+  /* ─── Semantic: Admin / Amber ─── */
+  --amber: #fbbf24;
+
+  /* ─── Semantic: Alert / Purple ─── */
+  --purple: #7228e8;
+  --purple-light: #b794ff;
+
+  /* ─── Text ─── */
+  --text-heading: #ffffff;
+  --text-primary: #e7ecff;
+  --text-secondary: #bcc7e8;
+  --text-muted: #8290b5;
+  --text-placeholder: #5a6a8f;
+  --text-slate-300: #c7d2f0;
+  --text-slate-50: #f8fafc;
+  --text-error: #ffb3be;
+  --text-white: #ffffff;
+
+  /* ─── Login-specific (mapped to base tokens) ─── */
+  --text-login-desc: #aab8dc;
+  --text-login-aside-icon: #8191bd;
+  --text-login-footer: #64759d;
+  --text-login-placeholder: #4d5e86;
+
+  /* ─── Glass borders / backgrounds (rgba layers) ─── */
+  --glass-border: rgba(122, 160, 255, 0.12);
+  --glass-border-strong: rgba(122, 160, 255, 0.18);
+  --glass-border-input: rgba(122, 160, 255, 0.2);
+  --glass-hover: rgba(18, 104, 255, 0.08);
+  --glass-bg: rgba(13, 18, 36, 0.4);
+  --glass-bg-hover: rgba(18, 104, 255, 0.1);
+  --glass-bg-input: rgba(13, 18, 36, 0.5);
+  --glass-shadow: rgba(0, 0, 0, 0.45);
+
+  /* ─── Semantic background tints ─── */
+  --green-bg: rgba(0, 231, 168, 0.06);
+  --green-border: rgba(0, 231, 168, 0.18);
+  --green-hover-shadow: rgba(0, 231, 168, 0.14);
+  --green-highlight-bg: rgba(0, 231, 168, 0.08);
+  --green-highlight-border: rgba(0, 231, 168, 0.24);
+  --green-icon-bg: rgba(0, 231, 168, 0.14);
+  --green-mov-bg: rgba(0, 231, 168, 0.1);
+
+  --red-bg: rgba(255, 66, 89, 0.06);
+  --red-border: rgba(255, 66, 89, 0.18);
+  --red-hover-shadow: rgba(255, 66, 89, 0.14);
+  --red-highlight-bg: rgba(255, 66, 89, 0.08);
+  --red-highlight-border: rgba(255, 66, 89, 0.24);
+  --red-icon-bg: rgba(255, 66, 89, 0.14);
+  --red-mov-bg: rgba(255, 66, 89, 0.1);
+  --red-alert-bg: rgba(255, 66, 89, 0.12);
+  --red-alert-border: rgba(255, 66, 89, 0.3);
+  --red-error-bg: rgba(255, 66, 89, 0.08);
+  --red-error-border: rgba(255, 66, 89, 0.55);
+
+  --blue-bg: rgba(18, 104, 255, 0.08);
+  --blue-border: rgba(18, 104, 255, 0.18);
+  --blue-hover-shadow: rgba(18, 104, 255, 0.14);
+  --blue-icon-bg: rgba(18, 104, 255, 0.16);
+  --blue-active-bg: rgba(18, 104, 255, 0.18);
+  --blue-active-gradient: linear-gradient(90deg, #1268ff 0%, #00b9e8 100%);
+  --blue-chip-active-bg: rgba(18, 104, 255, 0.22);
+  --blue-chip-active-shadow: rgba(18, 104, 255, 0.35);
+  --blue-option-active-bg: rgba(18, 104, 255, 0.12);
+  --blue-option-active-border: rgba(18, 104, 255, 0.4);
+  --blue-shadow: rgba(18, 104, 255, 0.6);
+  --blue-shadow-hover: rgba(18, 104, 255, 0.8);
+  --blue-focus-ring: rgba(18, 104, 255, 0.14);
+  --blue-focus-glow: rgba(0, 185, 232, 0.45);
+  --blue-brand-start: rgba(18, 104, 255, 0.22);
+  --blue-brand-border: rgba(18, 104, 255, 0.24);
+
+  --cyan-bg: rgba(0, 185, 232, 0.06);
+  --cyan-border: rgba(0, 185, 232, 0.18);
+  --cyan-hover-shadow: rgba(0, 185, 232, 0.14);
+  --cyan-icon-bg: rgba(0, 185, 232, 0.16);
+
+  --orange-bg: rgba(255, 165, 0, 0.08);
+  --orange-border: rgba(255, 165, 0, 0.2);
+  --orange-hover-shadow: rgba(255, 165, 0, 0.14);
+  --orange-icon-bg: rgba(255, 165, 0, 0.16);
+
+  --amber-bg: rgba(251, 191, 36, 0.12);
+  --amber-border: rgba(251, 191, 36, 0.22);
+
+  --purple-bg: rgba(114, 40, 232, 0.12);
+  --purple-border: rgba(114, 40, 232, 0.32);
+  --purple-icon-bg: rgba(114, 40, 232, 0.25);
+  --purple-btn-bg: rgba(114, 40, 232, 0.25);
+  --purple-btn-border: rgba(114, 40, 232, 0.45);
+  --purple-btn-hover-bg: rgba(114, 40, 232, 0.45);
+  --purple-btn-hover-border: rgba(114, 40, 232, 0.7);
+  --purple-btn-hover-shadow: rgba(114, 40, 232, 0.35);
+
+  /* ─── Login glows ─── */
+  --glow-blue: rgba(18, 104, 255, 0.3);
+  --glow-teal: rgba(0, 185, 232, 0.26);
+  --login-aside-border: rgba(188, 199, 232, 0.1);
+  --login-grid-line: rgba(188, 199, 232, 0.05);
+  --login-panel-border: rgba(188, 199, 232, 0.16);
+  --login-input-border: rgba(188, 199, 232, 0.24);
+
+  /* ─── Gradients ─── */
+  --gradient-brand: linear-gradient(135deg, #1268ff 0%, #00b9e8 100%);
+  --gradient-brand-sidebar: linear-gradient(135deg, rgba(18, 104, 255, 0.22), rgba(0, 185, 232, 0.08));
+  --gradient-brand-text: linear-gradient(135deg, #6ea8ff, #00e7a8);
+  --gradient-brand-text-login: linear-gradient(120deg, #ffffff 15%, #6ea8ff 60%, #7cf0ff 100%);
+
+  /* ─── Nuevos tokens para el nuevo diseño─── */
+  --panel-bg: #0d1224;
+  --panel-bg-alt: #111a36;
+  --sidebar-w: 240px;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --shadow-card: 0 8px 28px rgba(0, 0, 0, 0.35);
+  --shadow-soft: 0 4px 14px rgba(0, 0, 0, 0.25);
+  --font-display: 'Outfit', 'Inter', sans-serif;
+  --font-body: 'Inter', 'Segoe UI', sans-serif;
+}
