@@ -12,6 +12,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./pages/dashboard/dashboard.component').then((m) => m.DashboardComponent),
   },
+  {
+    path: 'ingresos',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/ingresos/ingresos.component').then((m) => m.IngresosComponent),
+  },
   // Secciones visibles y portadas al router: se mostrarán Próximamente.
   {
     path: 'gastos',
