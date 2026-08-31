@@ -1,0 +1,53 @@
+@import './theme.css';
+/* Shared application shell.  The dashboard was the original source of the
+   visual language; importing it here makes every section use the same cards,
+   spacing, tables and responsive rules. */
+@import './app/pages/dashboard/dashboard.component.css';
+@import './shared-styles.css';
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap');
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: var(--bg-primary);
+  font-family: var(--font-body, 'Inter', sans-serif);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+* { box-sizing: border-box; }
+
+.reference-stats .small-stat { font-size: 18px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+}
+
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  letter-spacing: 0.2px;
+}
+
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: rgba(122, 160, 255, 0.22); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(18, 104, 255, 0.4); }

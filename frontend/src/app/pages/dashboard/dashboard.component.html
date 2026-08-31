@@ -1,0 +1,312 @@
+<div class="app-shell">
+  <app-sidebar></app-sidebar>
+
+  <!-- Main Area -->
+  <div class="main-area">
+
+    <!-- ===== 1. HEADER ===== -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <nav class="breadcrumbs">
+          <span class="breadcrumb-link">Dashboard</span>
+          <span class="breadcrumb-sep">›</span>
+          <span class="breadcrumb-current">Dashboard</span>
+        </nav>
+        <h2 class="page-title">Dashboard</h2>
+        <p class="page-subtitle">Resumen del estado de tus finanzas</p>
+      </div>
+      <div class="topbar-right">
+        <app-selector-mes (mesSeleccionado)="onMesCambiado($event)"></app-selector-mes>
+        <button (click)="abrirNuevoGastoModal()" class="btn-primary"><lucide-icon [name]="'plus'" [size]="16"></lucide-icon> Nuevo Gasto</button>
+      </div>
+    </header>
+
+    <main class="page-content">
+      <!-- Loading -->
+      <div *ngIf="cargando() && gastosDelMes().length === 0" class="loading-state">
+        <img src="assets/Logo sinfondo.png" alt="Legatus" class="loading-logo" />
+        <div class="spinner"></div>
+        <p>Cargando dashboard...</p>
+      </div>
+
+      <div *ngIf="!cargando() || gastosDelMes().length > 0">
+
+        <!-- ===== 2. STAT CARDS ===== -->
+        <section class="stats-grid">
+          <div class="stat-card card-green">
+            <div class="stat-icon-wrap green"><lucide-icon [name]="'wallet'" [size]="20"></lucide-icon></div>
+            <div class="stat-content">
+              <span class="stat-label">INGRESOS DEL MES</span>
+              <span class="stat-value green-text">{{ totalIngresos() }}</span>
+              <span class="stat-change" [class.up]="porcentajeCambioIngresos() >= 0" [class.down]="porcentajeCambioIngresos() < 0">
+                <lucide-icon [name]="porcentajeCambioIngresos() >= 0 ? 'arrow-up-right' : 'arrow-down-right'" [size]="13"></lucide-icon>
+                {{ porcentajeCambioIngresos() | number:'1.0-0' }}% vs mes anterior
+              </span>
+            </div>
+          </div>
+
+          <div class="stat-card card-red">
+            <div class="stat-icon-wrap red"><lucide-icon [name]="'arrow-down-circle'" [size]="20"></lucide-icon></div>
+            <div class="stat-content">
+              <span class="stat-label">GASTOS DEL MES</span>
+              <span class="stat-value red-text">{{ totalGastado() }}</span>
+              <span class="stat-change" [class.up]="porcentajeCambioGastos() > 0" [class.down]="porcentajeCambioGastos() <= 0">
+                <lucide-icon [name]="porcentajeCambioGastos() > 0 ? 'arrow-up-right' : 'arrow-down-right'" [size]="13"></lucide-icon>
+                {{ porcentajeCambioGastos() | number:'1.0-0' }}% vs mes anterior
+              </span>
+            </div>
+          </div>
+
+          <div class="stat-card card-blue">
+            <div class="stat-icon-wrap blue"><lucide-icon [name]="'scale'" [size]="20"></lucide-icon></div>
+            <div class="stat-content">
+              <span class="stat-label">BALANCE</span>
+              <span class="stat-value blue-text">{{ balance() }}</span>
+              <span class="stat-change" [class.up]="porcentajeCambioBalance() >= 0" [class.down]="porcentajeCambioBalance() < 0">
+                <lucide-icon [name]="porcentajeCambioBalance() >= 0 ? 'arrow-up-right' : 'arrow-down-right'" [size]="13"></lucide-icon>
+                {{ porcentajeCambioBalance() | number:'1.0-0' }}% vs mes anterior
+              </span>
+            </div>
+          </div>
+
+          <div class="stat-card card-orange">
+            <div class="stat-icon-wrap orange"><lucide-icon [name]="'coins'" [size]="20"></lucide-icon></div>
+            <div class="stat-content">
+              <span class="stat-label">SALDO DISPONIBLE</span>
+              <span class="stat-value orange-text">{{ saldoDisponible() }}</span>
+              <span class="stat-change" [class.up]="porcentajeCambioBalance() >= 0" [class.down]="porcentajeCambioBalance() < 0">
+                <lucide-icon [name]="porcentajeCambioBalance() >= 0 ? 'arrow-up-right' : 'arrow-down-right'" [size]="13"></lucide-icon>
+                {{ porcentajeCambioBalance() | number:'1.0-0' }}% vs mes anterior
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== 3 & 4. CHARTS ROW ===== -->
+        <section class="charts-row">
+          <!-- 3. Evolución de gastos (line chart) -->
+          <div class="chart-panel glass-card">
+            <div class="panel-header">
+              <h3 class="panel-title">Evolución de gastos</h3>
+              <div class="filter-chips">
+                <button class="chip-btn" [class.active]="filtroGranularidad() === 'dia'" (click)="setFiltroGranularidad('dia')">Por día</button>
+                <button class="chip-btn" [class.active]="filtroGranularidad() === 'semana'" (click)="setFiltroGranularidad('semana')">Por semana</button>
+                <button class="chip-btn" [class.active]="filtroGranularidad() === 'mes'" (click)="setFiltroGranularidad('mes')">Total</button>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas baseChart
+                *ngIf="filtroGranularidad() === 'mes' && barChartData().datasets[0].data.length > 0"
+                [data]="barChartData()"
+                [options]="lineChartOptions()"
+                [type]="'bar'"
+              ></canvas>
+              <canvas baseChart
+                *ngIf="filtroGranularidad() !== 'mes' && lineChartData().datasets[0].data.length > 0"
+                [data]="lineChartData()"
+                [options]="lineChartOptions()"
+                [type]="'line'"
+              ></canvas>
+              <div
+                *ngIf="(filtroGranularidad() === 'mes' ? barChartData().datasets[0].data.length : lineChartData().datasets[0].data.length) === 0"
+                class="no-stats"
+              >Sin datos de gastos este mes</div>
+            </div>
+          </div>
+
+          <!-- 4. Gastos por categoría (donut) -->
+          <div class="chart-panel glass-card">
+            <div class="panel-header">
+              <h3 class="panel-title">Gastos por categoría</h3>
+              <select
+                class="panel-select"
+                [ngModel]="filtroPeriodoCategorias()"
+                (ngModelChange)="setFiltroPeriodoCategorias($event)"
+              >
+                <option value="mes">Este mes</option>
+                <option value="mesAnterior">Mes anterior</option>
+                <option value="tresMeses">Últimos 3 meses</option>
+              </select>
+            </div>
+            <div class="donut-layout">
+              <div class="donut-chart-wrap">
+                <canvas baseChart
+                  *ngIf="donutChartData().datasets[0].data.length > 0"
+                  [data]="donutChartData()"
+                  [options]="donutChartOptions()"
+                  [type]="'doughnut'"
+                ></canvas>
+                <div class="donut-center-label" *ngIf="donutChartData().datasets[0].data.length > 0">
+                  <span class="donut-center-total">{{ totalGastadoPeriodo() }}</span>
+                  <span class="donut-center-sub">Total</span>
+                </div>
+              </div>
+              <div class="donut-legend">
+                <div *ngFor="let cat of gastosPorCategoriaPeriodo()" class="legend-item">
+                  <span class="legend-dot" [style.background]="cat.color"></span>
+                  <span class="legend-name">{{ cat.name }}</span>
+                  <span class="legend-amount">{{ cat.amountFormatted }}</span>
+                  <span class="legend-pct">{{ cat.percentage }}%</span>
+                </div>
+                <div *ngIf="gastosPorCategoriaPeriodo().length === 0" class="no-stats">Sin datos en el período</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== 5, 6, 7. BOTTOM ROW ===== -->
+        <section class="bottom-row">
+
+          <!-- 5. Resumen financiero -->
+          <div class="bottom-panel glass-card">
+            <h3 class="panel-title"><lucide-icon [name]="'trending-up'" [size]="16" class="panel-title-icon"></lucide-icon> Resumen financiero</h3>
+            <div class="resumen-body">
+              <div class="resumen-highlight" [class.positive]="resumenMensaje().positivo" [class.negative]="!resumenMensaje().positivo">
+                <div class="highlight-icon">
+                  <lucide-icon [name]="resumenMensaje().positivo ? 'check-circle' : 'triangle-alert'" [size]="20"></lucide-icon>
+                </div>
+                <div>
+                  <div class="highlight-title">{{ resumenMensaje().positivo ? '¡Vas bien!' : 'Atención' }}</div>
+                  <div class="highlight-text">{{ resumenMensaje().texto }}</div>
+                </div>
+              </div>
+
+              <div class="resumen-mini-cards">
+                <div class="mini-card">
+                  <div class="mini-card-icon">
+                    <lucide-icon [name]="mayorGasto() ? getIconoCategoria(mayorGasto()?.categoria?.nombre) : 'package'" [size]="16"></lucide-icon>
+                  </div>
+                  <div class="mini-card-info">
+                    <span class="mini-card-label">Mayor gasto</span>
+                    <span class="mini-card-value" *ngIf="mayorGasto()">{{ mayorGasto()?.descripcion }}</span>
+                    <span class="mini-card-amount" *ngIf="mayorGasto()">{{ currencyService.formatear(mayorGasto()?.monto!) }}</span>
+                    <span class="mini-card-value muted" *ngIf="!mayorGasto()">Sin datos</span>
+                  </div>
+                </div>
+                <div class="mini-card">
+                  <div class="mini-card-icon"><lucide-icon [name]="'calendar'" [size]="16"></lucide-icon></div>
+                  <div class="mini-card-info">
+                    <span class="mini-card-label">Día con más gastos</span>
+                    <span class="mini-card-value" *ngIf="diaMasGastos()">{{ diaMasGastos()?.fecha }}</span>
+                    <span class="mini-card-amount" *ngIf="diaMasGastos()">{{ diaMasGastos()?.monto }}</span>
+                    <span class="mini-card-value muted" *ngIf="!diaMasGastos()">Sin datos</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 6. Presupuestos -->
+          <div id="presupuestos-section" class="bottom-panel glass-card">
+            <div class="panel-header">
+              <h3 class="panel-title"><lucide-icon [name]="'pie-chart'" [size]="16" class="panel-title-icon"></lucide-icon> Presupuestos</h3>
+              <a class="panel-link" [routerLink]="['/presupuestos']">Ver todos →</a>
+            </div>
+            <div class="presupuestos-body">
+              <div *ngFor="let p of presupuestosVisibles()" class="presupuesto-item">
+                <div class="presupuesto-header">
+                  <div class="presupuesto-label">
+                    <lucide-icon [name]="p.icono" [size]="14" class="presupuesto-icon" [style.color]="p.color"></lucide-icon>
+                    <span class="presupuesto-name">{{ p.nombre }}</span>
+                  </div>
+                  <span class="presupuesto-amounts">{{ p.gastado }} / {{ p.limite }}</span>
+                </div>
+                <div class="presupuesto-bar">
+                  <div class="presupuesto-fill"
+                    [style.width.%]="Math.min(p.porcentaje, 100)"
+                    [style.background]="p.porcentaje > 90 ? '#f43f5e' : p.porcentaje > 70 ? '#f97316' : p.color">
+                  </div>
+                </div>
+                <span class="presupuesto-pct" [class.alerta-text]="p.alerta">{{ p.porcentaje }}%</span>
+              </div>
+              <div *ngIf="presupuestos().length === 0" class="no-stats">Sin categorías para presupuestos</div>
+            </div>
+          </div>
+          <div id="movimientos-section" class="bottom-panel glass-card">
+            <div class="panel-header">
+              <h3 class="panel-title"><lucide-icon [name]="'clock'" [size]="16" class="panel-title-icon"></lucide-icon> Últimos movimientos</h3>
+              <a class="panel-link" [routerLink]="['/movimientos']">Ver todos →</a>
+            </div>
+            <div class="movimientos-body">
+              <div *ngFor="let m of movimientosRecientes()" class="movimiento-item">
+                <div class="mov-left">
+                  <div class="mov-icon-wrap" [class.mov-gasto]="m.tipo === 'gasto'" [class.mov-ingreso]="m.tipo === 'ingreso'">
+                    <lucide-icon [name]="m.icono" [size]="14"></lucide-icon>
+                  </div>
+                  <div class="mov-info">
+                    <span class="mov-desc">{{ m.descripcion }}</span>
+                    <span class="mov-cat">{{ m.categoria }} · {{ configService.formatearFecha(m.fecha) }}</span>
+                  </div>
+                </div>
+                <div class="mov-right">
+                  <span class="mov-amount" [class.gasto]="m.tipo === 'gasto'" [class.ingreso]="m.tipo === 'ingreso'">
+                    {{ m.tipo === 'gasto' ? '-' : '+' }}{{ currencyService.formatear(m.monto) }}
+                  </span>
+                  <span class="mov-arrow" [class.gasto]="m.tipo === 'gasto'" [class.ingreso]="m.tipo === 'ingreso'">
+                    {{ m.tipo === 'gasto' ? '↓' : '↑' }}
+                  </span>
+                </div>
+              </div>
+              <div *ngIf="movimientosRecientes().length === 0" class="no-stats">Sin movimientos este mes</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== 8. ALERTA PRESUPUESTO ===== -->
+        <app-alerta-presupuesto
+          *ngIf="presupuestoCritico()"
+          [nombreCategoria]="presupuestoCritico()!.nombre"
+          [porcentaje]="presupuestoCritico()!.porcentaje"
+          (verPresupuestos)="irAPresupuestos()"
+        ></app-alerta-presupuesto>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ===== MODAL NUEVO GASTO ===== -->
+  <div class="modal-backdrop" *ngIf="mostrarGastoModal()">
+    <div class="modal-container glass-card">
+      <div class="modal-header">
+        <h2>Registrar Nuevo Gasto</h2>
+        <button (click)="cerrarGastoModal()" class="btn-close-modal">&times;</button>
+      </div>
+      <form [formGroup]="gastoForm" (ngSubmit)="guardarGasto()" class="modal-form">
+        <div class="form-field">
+          <label for="descripcion">Descripción</label>
+          <input id="descripcion" type="text" formControlName="descripcion" placeholder="Ej. Súper de la semana" class="form-input" />
+          <div *ngIf="gastoForm.get('descripcion')?.touched && gastoForm.get('descripcion')?.invalid" class="form-error">
+            La descripción es obligatoria (máx. 100 caracteres).
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="monto">Monto ({{ currencyService.getSimbolo() }})</label>
+            <input id="monto" type="number" step="0.01" formControlName="monto" placeholder="0.00" class="form-input" />
+            <div *ngIf="gastoForm.get('monto')?.touched && gastoForm.get('monto')?.invalid" class="form-error">
+              Monto obligatorio y mayor a 0.
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="fecha">Fecha</label>
+            <input id="fecha" type="date" formControlName="fecha" class="form-input" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="categoriaId">Categoría</label>
+          <select id="categoriaId" formControlName="categoriaId" class="form-input">
+            <option value="" disabled>Seleccione una categoría</option>
+            <option *ngFor="let cat of categorias()" [value]="cat.id">{{ cat.nombre }}</option>
+          </select>
+          <div *ngIf="gastoForm.get('categoriaId')?.touched && gastoForm.get('categoriaId')?.invalid" class="form-error">
+            La categoría es obligatoria.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" (click)="cerrarGastoModal()" class="btn-secondary">Cancelar</button>
+          <button type="submit" class="btn-primary" [disabled]="gastoForm.invalid">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

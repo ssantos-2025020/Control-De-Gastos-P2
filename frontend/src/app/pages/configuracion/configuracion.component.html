@@ -1,0 +1,178 @@
+<div class="app-shell">
+  <app-sidebar></app-sidebar>
+
+  <!-- Área principal -->
+  <div class="main-area">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2 class="page-title">Configuración</h2>
+        <p class="page-subtitle">Administra las opciones principales del sistema.</p>
+      </div>
+    </header>
+
+    <main class="page-content settings-layout">
+      <aside class="glass-card settings-nav">
+        <button class="settings-nav-item" [class.active]="seccion() === 'general'" (click)="seccion.set('general')">
+          <lucide-icon name="settings" [size]="21"></lucide-icon> General
+        </button>
+        <button class="settings-nav-item" [class.active]="seccion() === 'perfil'" (click)="seccion.set('perfil')">
+          <lucide-icon name="user-round" [size]="21"></lucide-icon> Perfil
+        </button>
+        <button class="settings-nav-item" [class.active]="seccion() === 'moneda'" (click)="seccion.set('moneda')">
+          <lucide-icon name="circle-dollar-sign" [size]="21"></lucide-icon> Moneda
+        </button>
+      </aside>
+
+      <div class="settings-panels-col">
+
+        <section class="glass-card settings-panel" *ngIf="seccion() === 'general'">
+          <h3 class="settings-title">General</h3>
+          <p class="settings-sub">Información general del sistema.</p>
+
+          <div class="cfg-grid">
+            <div class="cfg-field">
+              <label class="settings-label">Nombre de la aplicación</label>
+              <input class="form-input" [(ngModel)]="nombreApp" name="nombreApp" placeholder="Nombre de la aplicación" />
+            </div>
+
+            <div class="cfg-field">
+              <label class="settings-label">Descripción</label>
+              <div class="cfg-textarea">
+                <textarea class="form-input" rows="3" [(ngModel)]="descripcion" name="descripcion" placeholder="Describe el sistema"></textarea>
+                <lucide-icon class="cfg-resize" name="grip-horizontal" [size]="14"></lucide-icon>
+              </div>
+            </div>
+
+            <div class="cfg-field">
+              <label class="settings-label">Formato de fecha</label>
+              <select class="form-input" [(ngModel)]="formatoFecha" name="formatoFecha">
+                <option value="dd/mm/yyyy">DD/MM/AAAA</option>
+                <option value="mm/dd/yyyy">MM/DD/AAAA</option>
+                <option value="yyyy-mm-dd">AAAA-MM-DD</option>
+              </select>
+            </div>
+
+            <div class="cfg-field">
+              <label class="settings-label">Formato de hora</label>
+              <select class="form-input" [(ngModel)]="formatoHora" name="formatoHora">
+                <option value="12">12 horas (03:45 PM)</option>
+                <option value="24">24 horas (15:45)</option>
+              </select>
+            </div>
+
+            <div class="cfg-field cfg-field-wide">
+              <label class="settings-label">Zona horaria</label>
+              <select class="form-input" [(ngModel)]="zonaHoraria" name="zonaHoraria">
+                <option *ngFor="let z of zonas" [value]="z.id">{{ z.label }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings-actions">
+            <button class="btn-primary" (click)="guardarGenerales()"><lucide-icon name="save" [size]="16"></lucide-icon> Guardar cambios</button>
+          </div>
+        </section>
+
+        <section class="glass-card settings-panel" *ngIf="seccion() === 'perfil'">
+          <h3 class="settings-title">Perfil</h3>
+          <p class="settings-sub">Información de tu cuenta.</p>
+
+          <div class="profile-head">
+            <div class="profile-avatar-wrap" *ngIf="usuario">
+              <div class="cfg-avatar">{{ inicial() }}</div>
+              <button type="button" class="avatar-camera" (click)="cambiarFoto()" [title]="'Cambiar foto'">
+                <lucide-icon name="camera" [size]="14"></lucide-icon>
+              </button>
+            </div>
+            <div class="profile-head-info">
+              <div class="profile-name">{{ perfilNombre || 'Sin nombre' }}</div>
+              <div class="profile-email">{{ perfilEmail }}</div>
+              <span class="role-badge role-admin">ADMIN</span>
+            </div>
+          </div>
+
+          <div class="cfg-grid perfil-grid">
+            <div class="cfg-field">
+              <label class="settings-label">Nombre completo</label>
+              <input class="form-input" [(ngModel)]="perfilNombre" name="perfilNombre" placeholder="Tu nombre completo" />
+            </div>
+
+            <div class="cfg-field">
+              <label class="settings-label">Nombre de usuario</label>
+              <input class="form-input cfg-readonly" [value]="perfilUsuario" readonly />
+            </div>
+
+            <div class="cfg-field cfg-field-wide">
+              <label class="settings-label">Correo electrónico</label>
+              <input class="form-input" type="email" [(ngModel)]="perfilEmail" name="perfilEmail" placeholder="correo@ejemplo.com" />
+            </div>
+          </div>
+
+          <div *ngIf="perfilError()" class="form-error cfg-error">
+            <lucide-icon name="triangle-alert" [size]="13"></lucide-icon> {{ perfilError() }}
+          </div>
+
+          <div class="settings-actions">
+            <button class="btn-primary" (click)="guardarPerfil()"><lucide-icon name="save" [size]="16"></lucide-icon> Guardar cambios</button>
+          </div>
+        </section>
+
+        <section class="glass-card settings-panel" *ngIf="seccion() === 'moneda'">
+          <h3 class="settings-title">Moneda</h3>
+          <p class="settings-sub">Configura la moneda y el formato de los montos.</p>
+
+          <div class="cfg-grid">
+            <div class="cfg-field">
+              <label class="settings-label">Moneda principal</label>
+              <select class="form-input" [ngModel]="monedaId()" (ngModelChange)="monedaId.set($event)" name="monedaPrincipal">
+                <option *ngFor="let m of monedas" [value]="m.id">{{ m.nombre }} ({{ m.simbolo }})</option>
+              </select>
+            </div>
+
+            <div class="cfg-field">
+              <label class="settings-label">Símbolo</label>
+              <input class="form-input cfg-readonly cfg-symbol" [value]="simboloPreview()" readonly />
+            </div>
+
+            <div class="cfg-field">
+              <label class="settings-label">Formato de número</label>
+              <select class="form-input" [ngModel]="formatoNumero()" (ngModelChange)="formatoNumero.set($event)" name="formatoNumero">
+                <option value="latam">1.234,56 (coma decimal)</option>
+                <option value="en">1,234.56 (punto decimal)</option>
+              </select>
+            </div>
+
+            <div class="cfg-field cfg-field-wide">
+              <label class="settings-label">Posición del símbolo</label>
+              <div class="radio-moneda">
+                <button type="button" class="radio-opt" [class.radio-active]="posicion() === 'antes'" (click)="posicion.set('antes')">
+                  <span class="radio-dot" [class.radio-dot-on]="posicion() === 'antes'"></span> Antes del monto ({{ simboloPreview() }} 100,00)
+                </button>
+                <button type="button" class="radio-opt" [class.radio-active]="posicion() === 'despues'" (click)="posicion.set('despues')">
+                  <span class="radio-dot" [class.radio-dot-on]="posicion() === 'despues'"></span> Después del monto (100,00 {{ simboloPreview() }})
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="moneda-preview">
+            <span class="moneda-preview-label">Vista previa de montos</span>
+            <span class="moneda-preview-val">{{ previewMonto() }}</span>
+            <span class="moneda-preview-sub">{{ previewLargo() }} · 35,86%</span>
+          </div>
+
+          <div class="settings-actions">
+            <button class="btn-primary" (click)="guardarMoneda()"><lucide-icon name="save" [size]="16"></lucide-icon> Guardar cambios</button>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <div class="cfg-toast" *ngIf="toast()">
+    <lucide-icon name="check-circle" [size]="17"></lucide-icon>
+    <span>{{ toast() }}</span>
+    <button class="cfg-toast-close" (click)="toast.set(null)" [title]="'Cerrar'">&times;</button>
+  </div>
+</div>

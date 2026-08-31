@@ -1,0 +1,138 @@
+/* ===================================================================
+   LEGATUS — Design System (clases compartidas del nuevo diseño)
+   Importadas globalmente desde styles.css
+   =================================================================== */
+
+/* ─── Breadcrumbs ─── */
+.breadcrumbs { display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 500; margin-bottom: 2px; }
+.breadcrumb-link { color: var(--text-muted); }
+.breadcrumb-sep { color: var(--text-placeholder); }
+.breadcrumb-current { color: var(--blue-light); font-weight: 600; }
+
+.topbar-left { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+
+/* ─── Toolbars + acciones ─── */
+.toolbar-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.page-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+/* ─── Listas top / ranking ─── */
+.top-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.top-list-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; background: var(--glass-bg); border: 1px solid var(--glass-border); }
+.top-amount { margin-left: auto; font-weight: 700; font-family: var(--font-display); font-size: 13px; white-space: nowrap; }
+
+/* ─── Badges de estado ─── */
+.estado-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+.estado-badge.ok { color: var(--green); background: var(--green-icon-bg); border: 1px solid var(--green-border); }
+.estado-badge.warn { color: var(--orange); background: var(--orange-icon-bg); border: 1px solid var(--orange-border); }
+.estado-badge.over { color: var(--red); background: var(--red-icon-bg); border: 1px solid var(--red-border); }
+.estado-badge.muted { color: var(--text-muted); background: var(--glass-bg); border: 1px solid var(--glass-border); }
+
+/* ─── Avatar circular del usuario ─── */
+.avatar-circle { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #fff; background: var(--gradient-brand); box-shadow: 0 2px 8px rgba(18, 104, 255, 0.35); }
+
+/* ─── Filas de categoría en tablas ─── */
+.cat-cell { display: flex; align-items: center; gap: 9px; }
+.cat-icon-box { width: 30px; height: 30px; flex-shrink: 0; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--blue-light); }
+.cat-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+.cat-name-main { font-weight: 600; color: var(--text-heading); }
+.cat-name-sub { font-size: 11px; color: var(--text-muted); }
+
+/* ─── Moñeco vacío ─── */
+.empty-box { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 36px 16px; color: var(--text-muted); text-align: center; }
+.empty-box .empty-icon { width: 52px; height: 52px; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-muted); }
+
+/* ─── Layout de dos columnas (contenido + panel lateral) ─── */
+.layout-two-col { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
+.sticky-panel { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 16px; }
+@media (max-width: 1120px) { .layout-two-col { grid-template-columns: 1fr; } .sticky-panel { position: static; } }
+
+/* ─── Formularios en paneles ─── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.form-field label { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+.form-field input.form-input { width: 100%; }
+
+/* ─── Selector de color (swatches) ─── */
+.color-swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+.swatch { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; outline: 2px solid transparent; transition: transform 0.12s ease; }
+.swatch:hover { transform: scale(1.12); }
+.swatch.selected { outline-color: var(--text-white); transform: scale(1.12); }
+
+/* ─── Selector de íconos ─── */
+.icon-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.icon-pill { width: 34px; height: 34px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-secondary); cursor: pointer; transition: all 0.12s ease; }
+.icon-pill:hover { border-color: var(--blue-border); color: var(--blue-light); }
+.icon-pill.selected { background: var(--blue-bg); border-color: var(--blue-option-active-border); color: var(--blue-light); box-shadow: 0 0 0 2px var(--blue-focus-ring); }
+
+/* ─── Anillo circular (resumen de presupuesto) ─── */
+.ring-overview { margin: 8px auto 14px; width: 158px; height: 158px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: conic-gradient(var(--ring-color, #00e7a8) calc(var(--ring-pct, 0) * 1%), rgba(122, 160, 255, 0.12) 0); box-shadow: 0 0 26px rgba(18, 104, 255, 0.12); }
+.ring-overview-inner { width: 112px; height: 112px; border-radius: 50%; background: #071a33; border: 1px solid var(--glass-border); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.ring-center { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.ring-value { font-family: var(--font-display); font-size: 26px; font-weight: 800; color: var(--text-white); }
+.ring-label { font-size: 10.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; text-align: center; }
+
+/* ─── Resumen del período (líneas de montos) ─── */
+.budget-summary { display: flex; align-items: stretch; gap: 18px; padding: 6px 0; }
+.budget-line { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px dashed var(--glass-border); font-size: 12.5px; }
+.budget-line:last-child { border-bottom: none; }
+.budget-line-label { color: var(--text-secondary); }
+.budget-line-value { font-weight: 700; color: var(--text-white); }
+
+/* ─── Mensaje de estado del presupuesto ─── */
+.budget-status { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.budget-msg { display: inline-flex; flex-direction: column; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; font-size: 12.5px; font-weight: 700; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); }
+.budget-msg.ok { color: var(--green); background: var(--green-highlight-bg); border-color: var(--green-highlight-border); }
+.budget-msg.warn { color: var(--orange); background: var(--orange-bg); border-color: var(--orange-border); }
+.budget-msg.tip { color: var(--blue-light); background: var(--blue-bg); border-color: var(--blue-border); }
+.budget-msg.over { color: var(--red); background: var(--red-highlight-bg); border-color: var(--red-highlight-border); }
+.budget-msg-text { margin: 0; font-size: 12px; font-weight: 500; line-height: 1.5; }
+
+/* ─── Filtros (búsqueda + estado) ─── */
+.filters-wrap { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.select-filter { align-self: auto; min-width: 160px; }
+
+/* ─── Tabla de presupuestos ─── */
+.budget-table-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.budget-name-cell { display: flex; align-items: center; gap: 10px; min-width: 150px; flex: 1 1 160px; }
+.budget-amounts { font-size: 12px; color: var(--text-secondary); font-weight: 500; white-space: nowrap; }
+.amount-spent { font-weight: 700; color: var(--text-white); }
+.over-text { color: var(--red) !important; }
+.amount-limit { color: var(--text-muted); font-weight: 500; font-size: 11px; }
+.progress-wrap { display: flex; align-items: center; gap: 8px; min-width: 150px; }
+.progress-track { flex: 1; height: 8px; min-width: 80px; border-radius: 999px; background: var(--glass-bg); overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 999px; }
+.progress-pct { font-size: 11.5px; font-weight: 700; color: var(--text-secondary); min-width: 30px; text-align: right; }
+.budget-section { padding: 20px; }
+.budget-section .table-responsive { margin-top: 6px; }
+.budget-table tfoot td { border-top: 1px solid var(--glass-border); padding-top: 12px; font-size: 12px; font-weight: 700; }
+.budget-table tfoot td span { vertical-align: middle; }
+
+/* ─── Modales ─── */
+.modal-wide { max-width: 760px !important; }
+.modal-hint { font-size: 12px; color: var(--text-muted); margin: 2px 0 0; line-height: 1.5; }
+
+/* ─── Pie de tabla (totales + paginación) ─── */
+.table-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+.table-totals { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--text-muted); }
+.table-totals strong { color: var(--text-primary); font-weight: 700; }
+.paginacion { display: flex; align-items: center; justify-content: center; gap: 16px; }
+.pagina-label { font-size: 13px; color: var(--text-secondary); font-weight: 600; }
+
+/* ─── Contador de filtros ─── */
+.filters-count { font-size: 12.5px; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
+
+/* ─── Usuario en tablas (punto de color) ─── */
+.user-badge { display: inline-flex; align-items: center; gap: 7px; }
+.user-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* ─── Configuración ─── */
+.user-chip-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--gradient-brand);
+  color: var(--text-white);
+  font-weight: 700;
+  flex-shrink: 0;
+}
