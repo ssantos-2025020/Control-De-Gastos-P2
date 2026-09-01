@@ -18,8 +18,15 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private vigilanciaUI: ReturnType<typeof setInterval> | null = null;
 
+  /** Throttle (ms) para no disparar la detección de actividad por cada evento. */
+  private static readonly THROTTLE_MS = 10_000;
+  private ultimaNotificacionActividad: number = 0;
+  private listenersLimpiados: (() => void)[] = [];
+
   ngOnInit(): void {
     this.authService.iniciarVigilancia();
+    this.authService.marcarActividad();
+    this.montarDeteccionActividad();
 
     // Vigilancia directa en la UI: si la sesión expira en cualquier momento,
     // volvemos al login aunque los timers del servicio fallen.
@@ -38,6 +45,47 @@ export class AppComponent implements OnInit, OnDestroy {
       clearInterval(this.vigilanciaUI);
       this.vigilanciaUI = null;
     }
+    this.destruirDeteccionActividad();
+  }
+
+  /**
+   * Escucha la actividad del usuario (mouse, clic, teclado, scroll y touch)
+   * con throttling para no sobrecargar de eventos. Cada detección actualiza la
+   * marca de actividad del servicio de sesión (sliding session).
+   */
+  private montarDeteccionActividad(): void {
+    const target = window;
+
+    const alDetectar = (): void => {
+      const ahora = Date.now();
+      if (ahora - this.ultimaNotificacionActividad >= AppComponent.THROTTLE_MS) {
+        this.ultimaNotificacionActividad = ahora;
+        this.authService.registrarActividad();
+      }
+    };
+
+    const eventos: (keyof WindowEventMap)[] = [
+      'mousemove',
+      'click',
+      'keydown',
+      'scroll',
+      'touchstart',
+      'touchmove',
+    ];
+
+    const manejar = (): void => alDetectar();
+
+    for (const tipo of eventos) {
+      target.addEventListener(tipo, manejar, { passive: true });
+      this.listenersLimpiados.push(() => target.removeEventListener(tipo, manejar));
+    }
+  }
+
+  private destruirDeteccionActividad(): void {
+    for (const limpiar of this.listenersLimpiados) {
+      limpiar();
+    }
+    this.listenersLimpiados = [];
   }
 
   extender(): void {
