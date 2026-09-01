@@ -33,6 +33,21 @@ const USUARIO_KEY = 'auth_usuario';
 /** Segundos antes de la expiración en que se muestra el aviso de cierre de sesión. */
 export const AVISO_SEGUNDOS = 60;
 
+/**
+ * Margen (ms) antes de la expiración en que la sesión se renueva de forma
+ * silenciosa si existe actividad reciente del usuario.
+ */
+const MARGEN_RENOVAR_MS = 5 * 60 * 1000;
+
+/**
+ * Ventana (ms) que se considera "actividad reciente": si el usuario tocó la
+ * app dentro de este lapso, se considera activo y la sesión se renueva sola.
+ */
+const VENTANA_ACTIVIDAD_MS = 2 * 60 * 1000;
+
+/** Cada cuánto se evalúa si corresponde renovar la sesión en silencio. */
+const INTERVALO_RENOVAR_MS = 30 * 1000;
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
@@ -42,6 +57,10 @@ export class AuthService {
   private avisoTimer: ReturnType<typeof setTimeout> | null = null;
   private countdownTimer: ReturnType<typeof setInterval> | null = null;
   private vigilanciaInterval: ReturnType<typeof setInterval> | null = null;
+  private renovarInterval: ReturnType<typeof setInterval> | null = null;
+
+  /** Timestamp (ms) de la última actividad detectada del usuario. */
+  private ultimaActividad: number = Date.now();
 
   /** Aviso de cierre inminente: nombre del usuario y segundos restantes. */
   readonly avisoExpiracion = signal<{ nombre: string; segundos: number } | null>(null);
@@ -123,6 +142,7 @@ export class AuthService {
     this.cerrarTimer();
     this.cerrarAviso();
     this.detenerVigilanciaInterval();
+    this.detenerRenovarInterval();
 
     const tokenExp = this.expiracion;
     if (tokenExp === null) {
@@ -149,6 +169,70 @@ export class AuthService {
     }
 
     this.expiracionTimer = setTimeout(() => this.expirarSesion(), ms);
+
+    // Sliding session: mientras haya actividad reciente, renovar el token en
+    // silencio antes de que expire para que la sesión no se cierre nunca.
+    this.renovarInterval = setInterval(() => this.renovarSiHayActividad(), INTERVALO_RENOVAR_MS);
+  }
+
+  /**
+   * Registra actividad del usuario (mouse, teclado, scroll, touch).
+   * Si ya está visible el aviso de expiración, lo cancela y renueva la sesión
+   * en silencio: la actividad reciente demuestra que sigue usando la app.
+   */
+  registrarActividad(): void {
+    this.ultimaActividad = Date.now();
+
+    // Si el aviso ya apareció pero el usuario retomó actividad, cancelar
+    // el cierre y renovar la sesión de inmediato.
+    if (this.avisoExpiracion() !== null) {
+      this.descartarAviso();
+      this.renovarSesionEnSilencio();
+      return;
+    }
+
+    this.renovarSiHayActividad();
+  }
+
+  /** Toca la marca de actividad sin renovar (útil al arrancar la detección). */
+  marcarActividad(): void {
+    this.ultimaActividad = Date.now();
+  }
+
+  private hayActividadReciente(): boolean {
+    return Date.now() - this.ultimaActividad <= VENTANA_ACTIVIDAD_MS;
+  }
+
+  private renovarSiHayActividad(): void {
+    if (!this.isAuthenticated()) {
+      return;
+    }
+    if (!this.hayActividadReciente()) {
+      return;
+    }
+
+    const tokenExp = this.expiracion;
+    if (tokenExp === null) {
+      return;
+    }
+
+    const ms = tokenExp * 1000 - Date.now();
+
+    // Solo se renueva cuando el token está por expirar, no constantemente.
+    if (ms <= MARGEN_RENOVAR_MS) {
+      this.renovarSesionEnSilencio();
+    }
+  }
+
+  private renovarSesionEnSilencio(): void {
+    this.ultimaActividad = Date.now();
+
+    this.extenderSesion().subscribe({
+      error: () => {
+        // Si el refresh falla (token ya inválido), la vigilancia se encargará
+        // de cerrar la sesión cuando corresponda.
+      },
+    });
   }
 
   /** Oculta el aviso (el cierre de sesión sigue ocurriendo). */
@@ -160,6 +244,7 @@ export class AuthService {
     this.cerrarTimer();
     this.cerrarAviso();
     this.detenerVigilanciaInterval();
+    this.detenerRenovarInterval();
     this.sesionExpirada.set(null);
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USUARIO_KEY);
@@ -220,6 +305,13 @@ export class AuthService {
     if (this.vigilanciaInterval !== null) {
       clearInterval(this.vigilanciaInterval);
       this.vigilanciaInterval = null;
+    }
+  }
+
+  private detenerRenovarInterval(): void {
+    if (this.renovarInterval !== null) {
+      clearInterval(this.renovarInterval);
+      this.renovarInterval = null;
     }
   }
 }
