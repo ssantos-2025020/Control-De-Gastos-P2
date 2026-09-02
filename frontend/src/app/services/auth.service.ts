@@ -62,6 +62,13 @@ export class AuthService {
   /** Timestamp (ms) de la última actividad detectada del usuario. */
   private ultimaActividad: number = Date.now();
 
+  /**
+   * Indica si el contador de expiración está pausado. Se pausa desde el login
+   * hasta la primera interacción del usuario con la página: el token NO empieza
+   * a venirse hasta que el usuario interactúa por primera vez.
+   */
+  private expiracionPausada: boolean = true;
+
   /** Aviso de cierre inminente: nombre del usuario y segundos restantes. */
   readonly avisoExpiracion = signal<{ nombre: string; segundos: number } | null>(null);
 
@@ -137,12 +144,33 @@ export class AuthService {
     }
   }
 
-  /** Programa el cierre de sesión automático y el aviso previo. */
+  /**
+   * Programa el cierre de sesión automático y el aviso previo.
+   * Si aún no hubo actividad del usuario, la cuenta queda en pausa y arrancará
+   * con la primera interacción (ver registrarActividad).
+   */
   iniciarVigilancia(): void {
     this.cerrarTimer();
     this.cerrarAviso();
     this.detenerVigilanciaInterval();
     this.detenerRenovarInterval();
+
+    // Sliding session: mientras haya actividad reciente, renovar el token en
+    // silencio antes de que expire para que la sesión no se cierre nunca.
+    this.renovarInterval = setInterval(() => this.renovarSiHayActividad(), INTERVALO_RENOVAR_MS);
+
+    // La cuenta de expiración solo comienza cuando el usuario interactúa.
+    if (this.expiracionPausada) {
+      return;
+    }
+
+    this.programarExpiracion();
+  }
+
+  /** Programa el aviso y el cierre de sesión según la expiración actual del token. */
+  private programarExpiracion(): void {
+    this.cerrarTimer();
+    this.cerrarAviso();
 
     const tokenExp = this.expiracion;
     if (tokenExp === null) {
@@ -169,10 +197,6 @@ export class AuthService {
     }
 
     this.expiracionTimer = setTimeout(() => this.expirarSesion(), ms);
-
-    // Sliding session: mientras haya actividad reciente, renovar el token en
-    // silencio antes de que expire para que la sesión no se cierre nunca.
-    this.renovarInterval = setInterval(() => this.renovarSiHayActividad(), INTERVALO_RENOVAR_MS);
   }
 
   /**
@@ -180,8 +204,15 @@ export class AuthService {
    * Si ya está visible el aviso de expiración, lo cancela y renueva la sesión
    * en silencio: la actividad reciente demuestra que sigue usando la app.
    */
-  registrarActividad(): void {
+registrarActividad(): void {
     this.ultimaActividad = Date.now();
+
+    // Primera interacción: desbloquear la pausa y empezar a correr la
+    // expiración del token (el token NO se vencía antes de interactuar).
+    if (this.expiracionPausada) {
+      this.expiracionPausada = false;
+      this.programarExpiracion();
+    }
 
     // Si el aviso ya apareció pero el usuario retomó actividad, cancelar
     // el cierre y renovar la sesión de inmediato.
