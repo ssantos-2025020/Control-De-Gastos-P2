@@ -20,11 +20,6 @@ import { LucideIconComponent } from '../../components/lucide-icon/lucide-icon.co
       <div class="main-area">
         <header class="topbar">
           <div class="topbar-left">
-            <nav class="breadcrumbs">
-              <span class="breadcrumb-link">Legatus</span>
-              <span class="breadcrumb-sep">›</span>
-              <span class="breadcrumb-current">{{ titulo }}</span>
-            </nav>
             <h2 class="page-title">{{ titulo }}</h2>
           </div>
         </header>

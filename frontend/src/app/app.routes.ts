@@ -34,7 +34,7 @@ export const routes: Routes = [
     path: 'presupuestos',
     canActivate: [authGuard],
     loadComponent: () => import('./pages/proximamente/proximamente.component').then((m) => m.ProximamenteComponent),
-    data: { titulo: 'Presupuestos', descripcion: 'Define límites mensuales por categoría y controla tu gasto.', icono: 'pie-chart' },
+    data: { titulo: 'Presupuestos', descripcion: 'Define límites mensuales por categoría y controla su gasto.', icono: 'pie-chart' },
   },
   {
     path: 'categorias',

@@ -400,7 +400,7 @@ export class DashboardComponent implements OnInit {
   resumenMensaje = computed(() => {
     const actual = this.totalGastadoUSD();
     const anterior = this.gastosMesAnterior().reduce((s, g) => s + Number(g.monto), 0);
-    if (anterior === 0) return { positivo: actual === 0, texto: actual > 0 ? 'Es tu primer mes registrado' : 'Sin gastos este mes', pct: 0 };
+    if (anterior === 0) return { positivo: actual === 0, texto: actual > 0 ? 'Es su primer mes registrado' : 'Sin gastos este mes', pct: 0 };
     const diff = Math.round(((actual - anterior) / anterior) * 100);
     if (actual <= anterior) {
       return { positivo: true, texto: `Has gastado ${Math.abs(diff)}% menos que el mes anterior`, pct: Math.abs(diff) };

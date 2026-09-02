@@ -17,7 +17,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error) => {
       if (error?.status === 401 && !req.url.includes('/auth/login')) {
         authService.cerrarSesion();
-        authService.sesionExpirada.set('Tu sesión ha expirado. Vuelve a iniciar sesión.');
+        authService.sesionExpirada.set('Su sesión ha expirado. Vuelve a iniciar sesión.');
       }
       return throwError(() => error);
     }),
